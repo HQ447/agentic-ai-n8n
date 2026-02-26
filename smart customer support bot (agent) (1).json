@@ -9,11 +9,17 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatGoogleGemini",
       "typeVersion": 1,
       "position": [
-        -1392,
-        1328
+        -1296,
+        1152
       ],
       "id": "09d33029-92ec-472c-870c-e9e8bfc40ad2",
-      "name": "Google Gemini Chat Model"
+      "name": "Google Gemini Chat Model",
+      "credentials": {
+        "googlePalmApi": {
+          "id": "HBGZyICFiXaDnduE",
+          "name": "Google Gemini(PaLM) Api account"
+        }
+      }
     },
     {
       "parameters": {
@@ -102,7 +108,7 @@
                   {
                     "id": "123478fb-0983-47a9-9fb6-560626ed3040",
                     "leftValue": "={{ $json.output.intent }}",
-                    "rightValue": "attendance_details",
+                    "rightValue": "attandance_details",
                     "operator": {
                       "type": "string",
                       "operation": "equals"
@@ -185,150 +191,6 @@
               },
               "renameOutput": true,
               "outputKey": "Other"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "189bc5a9-b852-4394-845c-64d22afead22",
-                    "leftValue": "={{ $json.output.intent }}",
-                    "rightValue": "add_new_emp",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Add New Employee"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "13185ec2-2763-41df-b609-bb934b4da020",
-                    "leftValue": "={{ $json.output.intent }}",
-                    "rightValue": "show_attendance",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Emp_attendance"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "62b1b0bc-11de-4e27-bdd2-efcb235ba268",
-                    "leftValue": "={{ $json.output.intent }}",
-                    "rightValue": "view_complains",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Show Complains"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "5f6120d9-2a8c-4fd9-9305-52b943633f60",
-                    "leftValue": "={{ $json.output.intent }}",
-                    "rightValue": "manager_greetings",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Manager Greetings"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "bf853af8-1859-48d4-a044-e19085644ebe",
-                    "leftValue": "={{ $json.output.intent }}",
-                    "rightValue": "incorrect_id",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Incorrect_manager_ID"
-            },
-            {
-              "conditions": {
-                "options": {
-                  "caseSensitive": true,
-                  "leftValue": "",
-                  "typeValidation": "strict",
-                  "version": 3
-                },
-                "conditions": [
-                  {
-                    "id": "1d56fed3-bf6b-41d3-8ae2-e501226ce998",
-                    "leftValue": "={{ $json.output.intent }}",
-                    "rightValue": "lack_of_emp_info",
-                    "operator": {
-                      "type": "string",
-                      "operation": "equals"
-                    }
-                  }
-                ],
-                "combinator": "and"
-              },
-              "renameOutput": true,
-              "outputKey": "Lack of info"
             }
           ]
         },
@@ -349,7 +211,7 @@
         "text": "={{ $json.message }}",
         "hasOutputParser": true,
         "options": {
-          "systemMessage": "=You are Smart HR Assistant of RZ Tech, an IT company providing web development and UI/UX services.\n\nYour job is to understand employee WhatsApp messages and respond professionally.\n\nYou must always respond in STRICT VALID JSON only.\nDo not add explanations.\nDo not add extra text.\nDo not use markdown.\nDo not wrap JSON in backticks.\n\n-----------------------------------------\nPOSSIBLE INTENTS\n-----------------------------------------\n\n1) greeting\n2) attendance\n3) complaint\n4) suggestion\n5) company_question\n6) other\n7) attandance_details\n\n-----------------------------------------\nATTENDANCE RULES\n-----------------------------------------\n\nIf the message indicates arrival, starting work, marking attendance, or being in office → status = \"Present\"\n\nIf the message indicates:\n- working from home\n- remote work\n- WFH\n→ status = \"WorkFromHome\"\n\nIf the message indicates:\n- coming late\n- stuck in traffic\n- delayed arrival\n→ status = \"Late\"\n\nIf the message indicates:\n- leave\n- sick leave\n- vacation\n- day off\n- not coming today\n→ status = \"Leave\"\n\nIf intent is not attendance, status must be empty.\n\n-----------------------------------------\nCOMPLAINT & SUGGESTION\n-----------------------------------------\n\nIf complaint or suggestion:\n- Extract the core message clearly into \"extracted_message\"\n- Keep it short and clean\n\n-----------------------------------------\nCOMPANY QUESTION\n-----------------------------------------\n\nIf the user asks about:\n- services\n- office timing\n- departments\n- company information\n\nProvide a short and professional reply by getting that info from info sheet attached.\n\n-----------------------------------------\nGREETING\n-----------------------------------------\n\nIf greeting:\nRespond politely and guide user:\n\nreplay according to the message \n\n-----------------------------------------\nAttendance Details\n-----------------------------------------\n1.attendance details means if someone ask about the month attendace details then go to the attached attandance sheet search that employee by phone number and get list of that employee attandance and there present , absent or leave number of the month.\n\n-----------------------------------------\nManager Intents\n-----------------------------------------\npossible manager intents are :\n1)add_new_emp\n2)view_complains\n3)show_attendance\n4)manager_greetings\n5)incorrect_id\n6)lack_of_emp_info\n\n1.if the user say he is manager or director in his message then reply him politly and professional like Sir or other but before that you are supposed to pass the following intents but before that go to the RZ info document heading 11.Managers or Directors of RZ , attached in tool and search and check the manager or director phone number and match it with the {{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }} if matched successfully and both are same then pass the manager intent accordingly other wise pass the manage intent no 5 which is incorrect_id and reply them accordingly like Sorry but your id is not matched anyy of our manager or director in our data so please message us with your registered phone number \n\n2. in adding new employee we are requesting the employee full name , phone number and gmail from the manager or director if he not provided that information and just say to add employee then pass the intent no 6) lack_of_emp_info and the request him to give us the proper details we need for emp registration.\n3) if the manager or director give emp_name , emp_phone and emp_emai and you identify the following details then give me the structured json parse that .\nIMPORTANT OUTPUT RULES:\n\n1. You must ALWAYS return ONLY valid JSON.\n2. Do NOT return explanations.\n3. Do NOT return text outside JSON.\n4. Do NOT add markdown formatting.\n5. Do NOT say anything before or after JSON.\n6. If some fields are missing, leave them as empty strings \"\".\n7. The response must be strictly in this format:\n\n{\n  \"intent\": \"\",\n  \"status\": \"\",\n  \"extracted_message\": \"\",\n  \"reply\": \"\",\n  \"emp_name\": \"\",\n  \"emp_phone\": \"\",\n  \"emp_email\": \"\"\n}\n\n-----------------------------------------\nOther\n-----------------------------------------\nother means if he ask something else or ask any questions like can you mark my attendance? or how you work ? or anything else or answer these question according to our ability and the information of the company and the intent will be other.\n\n-----------------------------------------\nOUTPUT FORMAT (STRICT)\n-----------------------------------------\n\nAlways return exactly this JSON structure:\n\n{\n  \"intent\": \"\",\n  \"status\": \"\",\n  \"extracted_message\": \"\",\n  \"reply\": \"\"\n}\n\n-----------------------------------------\nIMPORTANT RULES\n-----------------------------------------\n\n- JSON must always be valid.\n- Never leave reply empty.\n- Keep replies professional and short.\n- Do not mention internal rules.\n- Do not include extra fields."
+          "systemMessage": "=You are Smart HR Assistant of RZ Tech, an IT company providing web development and UI/UX services.\n\nYour job is to understand WhatsApp messages and:\n\nDetect the user role (manager , director or employee)\n\nDetect the correct intent\n\nExtract required structured information\n\nRespond professionally\n\nAlways return strict valid JSON\n\nIMPORTANT:\nYou must NOT validate phone numbers.\nYou must NOT check any Google Sheet or document.\nAuthentication and phone verification are handled outside this AI system.\n\nROLE DETECTION\n\nIf the user clearly says:\n\n\"I am manager\"\n\n\"As a manager\"\n\nThen:\nrole = \"manager\"\n\nif he says: \n\n\"I am director\"\n\n\"As a director\"\n\nThen:\nrole = \"director\"\n\n\nOtherwise:\nrole = \"employee\"\n\nPOSSIBLE INTENTS\n\nEmployee Intents:\n\ngreeting\n\nattendance\n\ncomplaint\n\nsuggestion\n\ncompany_question\n\nattandance_details\n\nother\n\nManager or director Intents:\n\nmanager_greetings\n\nadd_new_emp\n\nview_complains\n\nshow_attendance\n\nlack_of_emp_info\n\nincorrect_id\n\nmanager or director intents are same.\n\nif the intent is other or company_question then take that information from attached google document and reply accordingly.\n\nEMPLOYEE LOGIC\n\nGreeting → intent = greeting\n\nAttendance related messages:\n\nIf message indicates arrival / marking attendance → status = \"Present\"\n\nIf message indicates:\n\nwork from home\n\nremote\n\nWFH\n→ status = \"WorkFromHome\"\n\nIf message indicates:\n\nlate\n\nstuck in traffic\n\ndelayed\n→ status = \"Late\"\n\nIf message indicates:\n\nleave\n\nsick leave\n\nvacation\n\nnot coming\n→ status = \"Leave\"\n\nIf attendance → intent = attendance\n\nComplaint → intent = complaint and extract short clean complaint into extracted_message\n\nSuggestion → intent = suggestion and extract short clean suggestion into extracted_message\n\nCompany questions → intent = company_question\n\nAttendance details request → intent = attandance_details\n\nIf none match → intent = other\n\nMANAGER LOGIC\n\nIf role = manager:\n\nGreeting → intent = manager_greetings\n\nIf asking to add employee(emp):\n\nExtract:\n\nemp_name (full name)\n\nemp_phone\n\nemp_email\n\nIf any of the above missing:\nintent = lack_of_emp_info\nstatus = \"missing_information\"\n\nIf all (emp_name , emp_phone , emp_email) provided:\nintent = add_new_emp\nstatus = \"success\"\nnote: you are strictly notify that i manager want to add new employee or emp but you didnot identify the new employee name , email and phone in message than the intent should be = lack_of_emp_info\n\nIf asking to view complaints:\nintent = view_complains\n\nIf asking to show attendance:\nintent = show_attendance\n\nIf unclear manager request:\nintent = incorrect_id\n\nOUTPUT FORMAT (STRICT – DO NOT CHANGE)\n\nAlways return exactly this JSON structure:\n\n{\n\"role\": \"\",\n\"intent\": \"\",\n\"status\": \"\",\n\"extracted_message\": \"\",\n\"reply\": \"\",\n\"emp_name\": \"\",\n\"emp_phone\": \"\",\n\"emp_email\": \"\"\n}\n\nFIELD RULES\n\nrole:\n\"manager\" or \"employee\"\n\nintent:\nMust ALWAYS be one of the defined intents.\nNever leave empty.\n\nstatus:\nPossible values:\n\"Present\"\n\"WorkFromHome\"\n\"Late\"\n\"Leave\"\n\"success\"\n\"missing_information\"\nor \"\"\n\nextracted_message:\nShort cleaned summary of complaint, suggestion, or request.\nOtherwise return \"\"\n\nreply:\nProfessional and short WhatsApp-style response.\nNever leave empty.\n\nemp_name:\nOnly when adding employee.\nOtherwise \"\"\n\nemp_phone:\nOnly when adding employee.\nOtherwise \"\"\n\nemp_email:\nOnly when adding employee.\nOtherwise \"\"\n\nIMPORTANT RULES\n\nAlways return valid JSON.\n\nNever return empty response.\n\nNever add explanation text.\n\nNever change structure.\n\nNever remove fields.\n\nNever add extra fields.\n\nNever wrap JSON in markdown."
         }
       },
       "id": "ca996072-111e-4a65-8be0-948e10e4b4ac",
@@ -357,9 +219,11 @@
       "type": "@n8n/n8n-nodes-langchain.agent",
       "typeVersion": 3.1,
       "position": [
-        -896,
+        -1008,
         624
-      ]
+      ],
+      "alwaysOutputData": false,
+      "retryOnFail": false
     },
     {
       "parameters": {
@@ -393,31 +257,31 @@
     {
       "parameters": {
         "schemaType": "manual",
-        "inputSchema": "{\n  \"intent\": \"\",\n  \"status\": \"\",\n  \"extracted_message\": \"\",\n  \"reply\": \"\",\n  \"emp_name\" : \"\",\n  \"emp_phone\":\"\",\n  \"emp_email\":\"\"\n}"
+        "inputSchema": "{\n\"role\": \"\",\n\"intent\": \"\",\n\"status\": \"\",\n\"extracted_message\": \"\",\n\"reply\": \"\",\n\"emp_name\": \"\",\n\"emp_phone\": \"\",\n\"emp_email\": \"\"\n}"
       },
       "id": "f3468e8b-85f2-46b0-888c-97a680b326ca",
       "name": "Parse AI Response",
       "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
       "typeVersion": 1.3,
       "position": [
-        -688,
-        848
+        -1056,
+        832
       ]
     },
     {
       "parameters": {
         "conditions": {
           "options": {
-            "caseSensitive": true,
+            "caseSensitive": false,
             "leftValue": "",
-            "typeValidation": "strict",
+            "typeValidation": "loose",
             "version": 3
           },
           "conditions": [
             {
               "id": "1877d11d-c840-42ab-9ec3-db060661696b",
               "leftValue": "={{ $json.Phone }}",
-              "rightValue": "",
+              "rightValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
               "operator": {
                 "type": "number",
                 "operation": "exists",
@@ -427,7 +291,10 @@
           ],
           "combinator": "and"
         },
-        "options": {}
+        "looseTypeValidation": true,
+        "options": {
+          "ignoreCase": true
+        }
       },
       "type": "n8n-nodes-base.if",
       "typeVersion": 2.3,
@@ -458,7 +325,7 @@
           "values": [
             {
               "lookupColumn": "Phone",
-              "lookupValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}"
+              "lookupValue": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
             }
           ]
         },
@@ -467,8 +334,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -256,
-        -64
+        -336,
+        -304
       ],
       "id": "36806215-7df1-4aa3-98d1-2e1f46b06390",
       "name": "Searching employee in Sheet",
@@ -479,40 +346,6 @@
           "name": "Google Sheets account"
         }
       }
-    },
-    {
-      "parameters": {
-        "conditions": {
-          "options": {
-            "caseSensitive": true,
-            "leftValue": "",
-            "typeValidation": "strict",
-            "version": 3
-          },
-          "conditions": [
-            {
-              "id": "175a5120-a728-436b-a4dd-a6662537ad9b",
-              "leftValue": "={{ $('Route by Intent').item.json.output.intent }}",
-              "rightValue": "attendance",
-              "operator": {
-                "type": "string",
-                "operation": "equals",
-                "name": "filter.operator.equals"
-              }
-            }
-          ],
-          "combinator": "and"
-        },
-        "options": {}
-      },
-      "type": "n8n-nodes-base.if",
-      "typeVersion": 2.3,
-      "position": [
-        -1392,
-        -480
-      ],
-      "id": "a4eb373d-20b2-4aee-bc5e-6a9a76effb49",
-      "name": "check the req : attendance or complain"
     },
     {
       "parameters": {
@@ -698,7 +531,7 @@
       "typeVersion": 1.1,
       "position": [
         192,
-        48
+        64
       ],
       "id": "65d52854-76ae-4e18-b87e-5f0b06205824",
       "name": "Res: No Emp",
@@ -769,8 +602,8 @@
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        -256,
-        336
+        192,
+        736
       ],
       "id": "facfc8fc-30a9-43b3-b160-2c3587c45843",
       "name": "Send Greetings",
@@ -790,8 +623,8 @@
       "type": "n8n-nodes-base.googleDocsTool",
       "typeVersion": 2,
       "position": [
-        -816,
-        848
+        -1008,
+        1024
       ],
       "id": "58833db2-baea-4c5f-81a7-df62f1ba1896",
       "name": "Company info",
@@ -813,8 +646,8 @@
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        -256,
-        144
+        336,
+        688
       ],
       "id": "5a6b0349-78aa-47e2-a02f-6a2c5438f87c",
       "name": "Give info",
@@ -834,8 +667,8 @@
       "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
       "typeVersion": 1,
       "position": [
-        -944,
-        848
+        -1216,
+        816
       ],
       "id": "8c72702b-3f24-41e0-9410-8f998fc21677",
       "name": "OpenRouter Chat Model",
@@ -1005,14 +838,14 @@
         "operation": "send",
         "phoneNumberId": "=980013395199073",
         "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
-        "textBody": "= {{ $json.output.reply }}\nI can help with:\n1. Employee Registration\n2. Manage Complains\n3. Employees Attendance\n\nNote : For employee Registration we are requesting \n- Employee Full Name\n- Phone Number \n- Valid Email Address",
+        "textBody": "={{ $('AI Agent').item.json.output.reply }}\n\nI can help with:\n1. Employee Registration\n2. Manage Complains\n3. Employees Attendance\n\nNote : For employee Registration we are requesting \n- Employee Full Name\n- Phone Number \n- Valid Email Address",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        -256,
-        1104
+        384,
+        1600
       ],
       "id": "1fee3326-7c91-46e4-9292-4193d67e5e96",
       "name": "Manager Greetings",
@@ -1035,8 +868,8 @@
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        -256,
-        528
+        -240,
+        784
       ],
       "id": "21a5095c-fe11-44eb-881a-8ebf781dab90",
       "name": "emp other message response",
@@ -1053,14 +886,14 @@
         "operation": "send",
         "phoneNumberId": "=980013395199073",
         "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
-        "textBody": "= {{ $json.output.reply }}\n\nNote : For employee Registration we are requesting \n- Employee Full Name\n- Phone Number \n- Valid Email Address",
+        "textBody": "={{ $('AI Agent').item.json.output.reply }}\n\nNote : For employee Registration we are requesting \n- Employee Full Name\n- Phone Number \n- Valid Email Address",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        -256,
-        912
+        368,
+        1392
       ],
       "id": "66eeb72d-c743-4662-b39b-22d93edcf0b8",
       "name": "Lack of Employee info",
@@ -1092,9 +925,9 @@
         "columns": {
           "mappingMode": "defineBelow",
           "value": {
-            "Name": "={{ $json.output.emp_name }}",
-            "Email ": "={{ $json.output.emp_email }}",
-            "Phone": "={{ $json.output.emp_phone }}"
+            "Name": "={{ $('AI Agent').item.json.output.emp_name }}",
+            "Email ": "={{ $('AI Agent').item.json.output.emp_email }}",
+            "Phone": "={{ $('AI Agent').item.json.output.emp_phone }}"
           },
           "matchingColumns": [],
           "schema": [
@@ -1134,8 +967,8 @@
       "type": "n8n-nodes-base.googleSheets",
       "typeVersion": 4.7,
       "position": [
-        -192,
-        720
+        368,
+        1184
       ],
       "id": "08da0221-1228-4cb3-866c-05a6d2793c57",
       "name": "Employee Registration",
@@ -1157,8 +990,8 @@
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        80,
-        752
+        672,
+        1184
       ],
       "id": "fe2e657a-d545-4b80-8ad5-3b12556aab93",
       "name": "Emp registered success",
@@ -1175,14 +1008,14 @@
         "operation": "send",
         "phoneNumberId": "=980013395199073",
         "recipientPhoneNumber": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
-        "textBody": "= {{ $json.output.reply }}\n\n",
+        "textBody": "=Sorry we didnot found your record in company database , please message us on your registered phone number if your are {{ $('AI Agent').item.json.output.role }} . Thankyou\n",
         "additionalFields": {}
       },
       "type": "n8n-nodes-base.whatsApp",
       "typeVersion": 1.1,
       "position": [
-        0,
-        976
+        -496,
+        1376
       ],
       "id": "f0c67d91-b7b7-4d4f-8670-cc6a49a34558",
       "name": "incorrect id response",
@@ -1193,6 +1026,219 @@
           "name": "WhatsApp account"
         }
       }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "6ee47272-d730-433c-83e3-95af679b27d8",
+              "leftValue": "={{ $json.output.role }}",
+              "rightValue": "employee",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -704,
+        656
+      ],
+      "id": "3e3a71d2-5b4d-4159-8eab-cbeda7e67088",
+      "name": "If"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1hiMFj8Wp-P4E0sZAqbd6hRHMXtZoT4tocato943axKE",
+          "mode": "list",
+          "cachedResultName": "RZ Bot",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hiMFj8Wp-P4E0sZAqbd6hRHMXtZoT4tocato943axKE/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1122205485,
+          "mode": "list",
+          "cachedResultName": "Managers and Directors",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1hiMFj8Wp-P4E0sZAqbd6hRHMXtZoT4tocato943axKE/edit#gid=1122205485"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "phone",
+              "lookupValue": "={{ $('WhatsApp Trigger').item.json.messages[0].from }}"
+            },
+            {
+              "lookupColumn": "role",
+              "lookupValue": "={{ $json.output.role }}"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        -736,
+        1024
+      ],
+      "id": "5a03076f-66d0-45d1-beeb-7190973475cc",
+      "name": "Get row(s) in sheet1",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GJyygSMh370uPGuV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "cde14fdd-8fd8-4b41-a2f1-6e6526444d6a",
+              "leftValue": "={{ $json.phone }}",
+              "rightValue": "={{ $('WhatsApp Trigger').item.json.contacts[0].wa_id }}",
+              "operator": {
+                "type": "number",
+                "operation": "equals"
+              }
+            },
+            {
+              "id": "eaa976e4-733b-40a8-9b4e-06113952d527",
+              "leftValue": "={{ $json.role }}",
+              "rightValue": "={{ $('AI Agent').item.json.output.role }}",
+              "operator": {
+                "type": "string",
+                "operation": "equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        -544,
+        1024
+      ],
+      "id": "285745d5-c00f-48e0-a23f-76b32d93ceef",
+      "name": "If1"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "={{ $('AI Agent').item.json.output.intent }}",
+                    "rightValue": "add_new_emp",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "a77aae59-e5c1-4616-be53-7a2bafda2dc6"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Add new Emp"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "30317345-6f60-47b6-92cd-bff4ab936579",
+                    "leftValue": "={{ $('AI Agent').item.json.output.intent }}",
+                    "rightValue": "lack_of_emp_info",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Missing info"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "strict",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "caa10b6e-3cab-405b-b823-181f4b46c79d",
+                    "leftValue": "={{ $('AI Agent').item.json.output.intent }}",
+                    "rightValue": "manager_greetings",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals",
+                      "name": "filter.operator.equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Manager Greetings"
+            }
+          ]
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        -80,
+        1296
+      ],
+      "id": "7d19bf19-d6da-48b1-acb0-1d4a2281e93e",
+      "name": "Manager Routes"
     }
   ],
   "pinData": {},
@@ -1251,36 +1297,6 @@
             "type": "main",
             "index": 0
           }
-        ],
-        [
-          {
-            "node": "Employee Registration",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [],
-        [],
-        [
-          {
-            "node": "Manager Greetings",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "incorrect id response",
-            "type": "main",
-            "index": 0
-          }
-        ],
-        [
-          {
-            "node": "Lack of Employee info",
-            "type": "main",
-            "index": 0
-          }
         ]
       ]
     },
@@ -1288,7 +1304,7 @@
       "main": [
         [
           {
-            "node": "Route by Intent",
+            "node": "If",
             "type": "main",
             "index": 0
           }
@@ -1344,12 +1360,6 @@
             "index": 0
           }
         ]
-      ]
-    },
-    "check the req : attendance or complain": {
-      "main": [
-        [],
-        []
       ]
     },
     "complaint": {
@@ -1442,6 +1452,83 @@
           }
         ]
       ]
+    },
+    "Google Gemini Chat Model": {
+      "ai_languageModel": [
+        []
+      ]
+    },
+    "If": {
+      "main": [
+        [
+          {
+            "node": "Route by Intent",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Get row(s) in sheet1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Get row(s) in sheet1": {
+      "main": [
+        [
+          {
+            "node": "If1",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "If1": {
+      "main": [
+        [
+          {
+            "node": "Manager Routes",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "incorrect id response",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Manager Routes": {
+      "main": [
+        [
+          {
+            "node": "Employee Registration",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Lack of Employee info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Manager Greetings",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
     }
   },
   "active": false,
@@ -1450,8 +1537,9 @@
     "binaryMode": "separate",
     "availableInMCP": false
   },
-  "versionId": "39b580d4-27ab-4d20-a4f4-723615a8810a",
+  "versionId": "ef1ada80-9c07-4ff2-961a-a04cae80b505",
   "meta": {
+    "templateCredsSetupCompleted": true,
     "instanceId": "4390f5bd1a9241ebd0fb445e47b185acd85e4e16647c4bfe2b459e58f2149537"
   },
   "id": "346o95la7R7q3gd4",
