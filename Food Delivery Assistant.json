@@ -1,0 +1,1025 @@
+{
+  "name": "My workflow",
+  "nodes": [
+    {
+      "parameters": {
+        "options": {
+          "responseMode": "responseNodes"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chatTrigger",
+      "typeVersion": 1.4,
+      "position": [
+        -528,
+        48
+      ],
+      "id": "bcdb3073-68e8-4149-8027-4a077213b43e",
+      "name": "When chat message received",
+      "webhookId": "0424babb-1d56-4419-9141-386db2ccf58a",
+      "alwaysOutputData": true
+    },
+    {
+      "parameters": {
+        "hasOutputParser": true,
+        "options": {
+          "systemMessage": "=You are a food delivery assistant.\n\nYour job:\n1. Detect user intent.\n2. Extract structured information.\n3.replay to the customer message politly and professionality according to that message\n4. if customer want to track there order but he didnot provide order id so in that case the intent is \"missing_order_id\"  , req them to enter your order id for tracking\n5. when you detect any food item name first of all capitalize the first letter of the named for example if customer says pizza you change that to \"Pizza\" , if customer say zinger burger you tranformed that to \"Zinger Burger\" etc\n6.If customer want to give/submit order but he didnot provide name , phone , address , food item name and quantity , if he miss any of the field then the intent = \"missing_order_submitting_info\".\n\nReturn ONLY JSON in this format:\n\n{\n  \"intent\": \"\",\n  \"food_item\": \"\",\n  \"quantity\": \"\",\n  \"customer_name\": \"\",\n  \"address\": \"\",\n  \"phone\": \"\",\n  \"order_id\": \"\",\n  \"complaint_text\": \"\",\n\"replay\":\"\",\n}\n\nIntent must be one of:\n- show_menu\n- check_availability\n- place_order\n- track_order\n- complaint\n- greeting\n- missing_order_id\n- missing_order_submitting_info"
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.agent",
+      "typeVersion": 3.1,
+      "position": [
+        -304,
+        48
+      ],
+      "id": "a1333f9f-a349-45ce-920d-d1fe1ddc89c9",
+      "name": "AI Agent"
+    },
+    {
+      "parameters": {
+        "model": "deepseek/deepseek-chat",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.lmChatOpenRouter",
+      "typeVersion": 1,
+      "position": [
+        -296,
+        272
+      ],
+      "id": "053ffcaf-5a4a-4018-a927-3d38654adb3f",
+      "name": "OpenRouter Chat Model",
+      "credentials": {
+        "openRouterApi": {
+          "id": "3ntc9Ga433PnWHiI",
+          "name": "OpenRouter account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "jsonSchemaExample": "{\n  \"intent\": \"\",\n  \"food_item\": \"\",\n  \"quantity\": \"\",\n  \"customer_name\": \"\",\n  \"address\": \"\",\n  \"phone\": \"\",\n  \"order_id\": \"\",\n  \"complaint_text\": \"\",\n  \"replay\":\"\"\n}"
+      },
+      "type": "@n8n/n8n-nodes-langchain.outputParserStructured",
+      "typeVersion": 1.3,
+      "position": [
+        -168,
+        272
+      ],
+      "id": "330adf73-e8ec-4f79-81cf-87f52ac9113b",
+      "name": "Structured Output Parser"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I",
+          "mode": "list",
+          "cachedResultName": "Food Delivery Assistant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "food items",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit#gid=0"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        -336
+      ],
+      "id": "511efd7f-39f1-46c4-b6b6-94317fd6b0a6",
+      "name": "Menu",
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GJyygSMh370uPGuV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $('AI Agent').item.json.output.replay }}\n{{$json.text}}",
+        "options": {
+          "memoryConnection": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        -336
+      ],
+      "id": "cb360968-8c2d-4c8b-8a63-178109b211e8",
+      "name": "send menu list",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "jsCode": "let message = 'Here are the items currently available:\\n\\n';\n\nfor (let i = 0; i < items.length; i++) {\n  const item = items[i].json;\n  if(item.availability === 'yes') {\n    message += `🍔 ${item.item_name} - Rs ${item.price}\\n${item.description}\\n\\n`;\n  }\n}\n\nreturn [{ json: { text: message } }];"
+      },
+      "type": "n8n-nodes-base.code",
+      "typeVersion": 2,
+      "position": [
+        496,
+        -336
+      ],
+      "id": "fb8114f2-913b-4c62-a49d-8a3ecdf8139e",
+      "name": "Code in JavaScript"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output.replay }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        -528
+      ],
+      "id": "c8f7c828-21c8-49fe-bbcd-9893aa22a8a4",
+      "name": "Greetings Replay",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I",
+          "mode": "list",
+          "cachedResultName": "Food Delivery Assistant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": "gid=0",
+          "mode": "list",
+          "cachedResultName": "food items",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit#gid=0"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "item_name",
+              "lookupValue": "={{ $('AI Agent').item.json.output.food_item }}"
+            },
+            {
+              "lookupColumn": "availability",
+              "lookupValue": "yes"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        -48
+      ],
+      "id": "34a67954-9aa9-4f4a-b38d-1caf40f3fa43",
+      "name": "check Food availability",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GJyygSMh370uPGuV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "=Yes, {{ $('check Food availability').item.json.item_name }} is currently available. Would you like to place an order?",
+        "options": {
+          "memoryConnection": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        944,
+        -48
+      ],
+      "id": "0fc634df-b1bb-4f8d-a194-92ecdb96a0ff",
+      "name": "available",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "message": "=We are extemely sorry ,{{ $('AI Agent').item.json.output.food_item }} is currently not available. Would you like to check our available Menu?",
+        "options": {
+          "memoryConnection": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        48
+      ],
+      "id": "ba9c4579-e597-4c07-b95e-6574418f80c5",
+      "name": "Not Available",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output.replay }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        144
+      ],
+      "id": "14c9af42-ec86-464c-bef6-8df082454d9a",
+      "name": "Req for Order ID",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "rules": {
+          "values": [
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "leftValue": "greeting",
+                    "rightValue": "={{ $json.output.intent }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    },
+                    "id": "6b9b1f20-3f8a-4c7d-8d3a-56e3ea668d1b"
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Greetings"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "58f4810a-bbbd-46b4-9ba7-ef3bc959d1c4",
+                    "leftValue": "show_menu",
+                    "rightValue": "={{ $json.output.intent }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Menu"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "42f57489-a1f8-4c4a-99c3-670c9171ae9f",
+                    "leftValue": "check_availability",
+                    "rightValue": "={{ $json.output.intent }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "check availaibilty"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "7b971155-be26-4f97-a948-6abe24a2fb7b",
+                    "leftValue": "place_order",
+                    "rightValue": "={{ $json.output.intent }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "8dc6abf8-47a0-44fb-a98d-eff348cc90f2",
+                    "leftValue": "track_order",
+                    "rightValue": "={{ $json.output.intent }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Track Order"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "a4a1b60d-2642-43fa-ac77-c4ee70651b64",
+                    "leftValue": "complaint",
+                    "rightValue": "={{ $json.output.intent }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Complaint"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "176a0110-332c-4832-b38c-f242cde5c630",
+                    "leftValue": "missing_order_id",
+                    "rightValue": "={{ $json.output.intent }}",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Missing tracking ID"
+            },
+            {
+              "conditions": {
+                "options": {
+                  "caseSensitive": true,
+                  "leftValue": "",
+                  "typeValidation": "loose",
+                  "version": 3
+                },
+                "conditions": [
+                  {
+                    "id": "d3bff16c-2042-4c09-a035-9a0fa63a5e41",
+                    "leftValue": "={{ $json.output.intent }}",
+                    "rightValue": "missing_order_submitting_info",
+                    "operator": {
+                      "type": "string",
+                      "operation": "equals"
+                    }
+                  }
+                ],
+                "combinator": "and"
+              },
+              "renameOutput": true,
+              "outputKey": "Req_Order_details"
+            }
+          ]
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.switch",
+      "typeVersion": 3.4,
+      "position": [
+        48,
+        -48
+      ],
+      "id": "f0ab263f-9ded-4d90-8ed0-e8e2ce26d1f6",
+      "name": "possible intents"
+    },
+    {
+      "parameters": {
+        "operation": "append",
+        "documentId": {
+          "__rl": true,
+          "value": "1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I",
+          "mode": "list",
+          "cachedResultName": "Food Delivery Assistant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1532900594,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit#gid=1532900594"
+        },
+        "columns": {
+          "mappingMode": "defineBelow",
+          "value": {
+            "Order_id": "={{ Math.floor(10000 + Math.random() * 90000) }}",
+            "Customer_name": "={{ $('AI Agent').item.json.output.customer_name }}",
+            "quantity": "={{ $('AI Agent').item.json.output.quantity }}",
+            "phone": "={{ $('AI Agent').item.json.output.phone }}",
+            "address": "={{ $('AI Agent').item.json.output.address }}",
+            "stauts": "Pending",
+            "food_item": "={{ $('check Food availability').item.json.item_name }}",
+            "price": "={{ $('check Food availability').item.json.price * $('AI Agent').item.json.output.quantity }}",
+            "date and time": "={{ new Date().toLocaleString() }}"
+          },
+          "matchingColumns": [],
+          "schema": [
+            {
+              "id": "Order_id",
+              "displayName": "Order_id",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "Customer_name",
+              "displayName": "Customer_name",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "food_item",
+              "displayName": "food_item",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "quantity",
+              "displayName": "quantity",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "price",
+              "displayName": "price",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true,
+              "removed": false
+            },
+            {
+              "id": "phone",
+              "displayName": "phone",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "address",
+              "displayName": "address",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "date and time",
+              "displayName": "date and time",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            },
+            {
+              "id": "stauts",
+              "displayName": "stauts",
+              "required": false,
+              "defaultMatch": false,
+              "display": true,
+              "type": "string",
+              "canBeUsedToMatch": true
+            }
+          ],
+          "attemptToConvertTypes": false,
+          "convertFieldsToString": false
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        944,
+        -240
+      ],
+      "id": "2384f2fa-58b4-4651-a6f6-8fa462d0b6f7",
+      "name": "submit order",
+      "retryOnFail": false,
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GJyygSMh370uPGuV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "={{ $('AI Agent').item.json.output.replay }} , your Order Tracking id is : {{ $json.Order_id }}",
+        "options": {
+          "memoryConnection": false
+        }
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        1168,
+        -240
+      ],
+      "id": "0f64c9d1-899a-41b9-ba0b-546ed3bd2829",
+      "name": "order confirmed",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "documentId": {
+          "__rl": true,
+          "value": "1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I",
+          "mode": "list",
+          "cachedResultName": "Food Delivery Assistant",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit?usp=drivesdk"
+        },
+        "sheetName": {
+          "__rl": true,
+          "value": 1532900594,
+          "mode": "list",
+          "cachedResultName": "Orders",
+          "cachedResultUrl": "https://docs.google.com/spreadsheets/d/1obRWtEzxDTl9wfTW863hI3iVrOGeopz6hJiRbPEMu7I/edit#gid=1532900594"
+        },
+        "filtersUI": {
+          "values": [
+            {
+              "lookupColumn": "Order_id",
+              "lookupValue": "={{ $json.output.order_id }}"
+            }
+          ]
+        },
+        "options": {
+          "returnFirstMatch": false
+        }
+      },
+      "type": "n8n-nodes-base.googleSheets",
+      "typeVersion": 4.7,
+      "position": [
+        272,
+        336
+      ],
+      "id": "657e4afa-bffa-490a-9a1f-f61d43d0a875",
+      "name": "track order",
+      "alwaysOutputData": true,
+      "credentials": {
+        "googleSheetsOAuth2Api": {
+          "id": "GJyygSMh370uPGuV",
+          "name": "Google Sheets account"
+        }
+      }
+    },
+    {
+      "parameters": {
+        "message": "=Thank you for providing your order ID. Your order {{ $json.Order_id }} {{ $json.food_item }} status is {{ $('track order').item.json.stauts }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        240
+      ],
+      "id": "bf5c3ae0-ab20-47bb-911a-2bc986f901d2",
+      "name": "order info",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "message": "=Sorry we didnot found your order by that Id you provided , kindly check your order ID .",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        720,
+        432
+      ],
+      "id": "abcfc577-0ad2-491a-a260-724cebae3a63",
+      "name": "incorrect order id",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "loose",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "bfb6b9cf-c347-445a-8a04-0eea4f6ab3b7",
+              "leftValue": "={{ $json.Order_id }}",
+              "rightValue": 0,
+              "operator": {
+                "type": "number",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "looseTypeValidation": true,
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        336
+      ],
+      "id": "face39cd-8d75-486b-91c1-d07e58ca3a6c",
+      "name": "is correct id exists?"
+    },
+    {
+      "parameters": {
+        "message": "={{ $json.output.replay }}",
+        "options": {}
+      },
+      "type": "@n8n/n8n-nodes-langchain.chat",
+      "typeVersion": 1.2,
+      "position": [
+        272,
+        528
+      ],
+      "id": "6e194697-5894-4191-978b-20b85a961835",
+      "name": "Req for Order Details",
+      "webhookId": "711f40dc-a71a-4710-8369-c97e11ec947c"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "91b56a3e-cc34-435d-9fde-efaffdfc41db",
+              "leftValue": "={{ $json.item_name }}",
+              "rightValue": "",
+              "operator": {
+                "type": "string",
+                "operation": "notEmpty",
+                "singleValue": true
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        496,
+        -48
+      ],
+      "id": "146fc7a3-dbdc-4c6d-8b27-c6c36e3246f1",
+      "name": "is that item Available?"
+    },
+    {
+      "parameters": {
+        "conditions": {
+          "options": {
+            "caseSensitive": true,
+            "leftValue": "",
+            "typeValidation": "strict",
+            "version": 3
+          },
+          "conditions": [
+            {
+              "id": "2a5f32ab-038f-4cf3-93fe-13e14067acd3",
+              "leftValue": "={{ $('AI Agent').item.json.output.intent }}",
+              "rightValue": "place_order",
+              "operator": {
+                "type": "string",
+                "operation": "equals",
+                "name": "filter.operator.equals"
+              }
+            }
+          ],
+          "combinator": "and"
+        },
+        "options": {}
+      },
+      "type": "n8n-nodes-base.if",
+      "typeVersion": 2.3,
+      "position": [
+        720,
+        -144
+      ],
+      "id": "28d24ba8-9bd1-4399-95d2-ae6521140cd4",
+      "name": "is order or check availabilty?"
+    }
+  ],
+  "pinData": {},
+  "connections": {
+    "When chat message received": {
+      "main": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "OpenRouter Chat Model": {
+      "ai_languageModel": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_languageModel",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "AI Agent": {
+      "main": [
+        [
+          {
+            "node": "possible intents",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Structured Output Parser": {
+      "ai_outputParser": [
+        [
+          {
+            "node": "AI Agent",
+            "type": "ai_outputParser",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Menu": {
+      "main": [
+        [
+          {
+            "node": "Code in JavaScript",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "Code in JavaScript": {
+      "main": [
+        [
+          {
+            "node": "send menu list",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "check Food availability": {
+      "main": [
+        [
+          {
+            "node": "is that item Available?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "possible intents": {
+      "main": [
+        [
+          {
+            "node": "Greetings Replay",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Menu",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "check Food availability",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "check Food availability",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "track order",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [],
+        [
+          {
+            "node": "Req for Order ID",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Req for Order Details",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "submit order": {
+      "main": [
+        [
+          {
+            "node": "order confirmed",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "track order": {
+      "main": [
+        [
+          {
+            "node": "is correct id exists?",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is correct id exists?": {
+      "main": [
+        [
+          {
+            "node": "order info",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "incorrect order id",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is that item Available?": {
+      "main": [
+        [
+          {
+            "node": "is order or check availabilty?",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "Not Available",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    },
+    "is order or check availabilty?": {
+      "main": [
+        [
+          {
+            "node": "submit order",
+            "type": "main",
+            "index": 0
+          }
+        ],
+        [
+          {
+            "node": "available",
+            "type": "main",
+            "index": 0
+          }
+        ]
+      ]
+    }
+  },
+  "active": false,
+  "settings": {
+    "executionOrder": "v1",
+    "binaryMode": "separate",
+    "availableInMCP": false
+  },
+  "versionId": "5d555fa4-e37f-4cbb-abc6-3d50d7d1c01f",
+  "meta": {
+    "templateCredsSetupCompleted": true,
+    "instanceId": "4390f5bd1a9241ebd0fb445e47b185acd85e4e16647c4bfe2b459e58f2149537"
+  },
+  "id": "hB1h9KuxzVIYXDlw",
+  "tags": []
+}
